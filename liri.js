@@ -1,59 +1,156 @@
 require("dotenv").config();
 var axios = require("axios");
-// var fs = require("fs");
+var fs = require("fs");
 
-// var Spotify = require('node-spotify-api');
+var fs = require("fs");
 
-// var keys = require("./keys.js");
+var Spotify = require('node-spotify-api');
 
-// var spotify = new Spotify(keys.spotify);
+var keys = require("./keys.js");
 
+var spotify = new Spotify(keys.spotify);
+var moment = require('moment');
 
-var concertFinder = function () {
-    // divider will be used as a spacer between the tv data we print in log.txt
-    // var divider = "\n------------------------------------------------------------\n\n";
-    
-    // findConcert takes in the name of an artist show and searches the Bandsintown API
+var liri = function () {
+    var divider = "\n------------------------------------------------------------\n\n";
     this.findConcert = function (artist) {
         axios
-        .get("https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp")
-        .then(function (response) {
-            // Place the response.data into a variable, jsonData.
-            var jsonData = response.data;
-            console.log(jsonData.name)
-            // showData ends up being the string containing the show data we will print to the console
-            // var showData = [
-                //     "Artist " + jsonData.name,
-                //     "Venue: " + jsonData.venues.city.join(", "),
-                //     "Date of Event: " + jsonData.datetime,
-                
-                // ].join("\n\n");
-                
-                // // Append showData and the divider to log.txt, print showData to the console
-                // fs.appendFile("random.txt", showData + divider, function (err) {
-                    //     if (err) throw err;
-                    //     console.log(showData);
-                    // });
-                })
-                .catch(function (error) {
-                    if (error.response) {
-                        // The request was made and the server responded with a status code
-                        // that falls out of the range of 2xx
-                        console.log(error.response.data);
-                        console.log(error.response.status);
-                        console.log(error.response.headers);
-                    } else if (error.request) {
-                        // The request was made but no response was received
-                        // `error.request` is an object that comes back with details pertaining to the error that occurred.
-                        console.log(error.request);
-                    } else {
-                        // Something happened in setting up the request that triggered an Error
-                        console.log("Error", error.message);
-                    }
-                    console.log(error.config);
-                })
+            .get(
+                'https://rest.bandsintown.com/artists/' +
+                artist +
+                '/events?app_id=codingbootcamp'
+            )
+            .then(function (response) {
+
+                var jsonDataOne = response.data;
+                var time = jsonDataOne[1].datetime
+                time = moment(time).format("MM/DD/YYYY");
+                var showArtistData = [
+                    "Venue: " + jsonDataOne[1].venue.name,
+                    "City: " + jsonDataOne[1].venue.city,
+                    "State: " + jsonDataOne[1].venue.region,
+                    "When: " + time
+
+                ].join("\n\n");
+
+                fs.appendFile("log.txt", showArtistData + divider, function (err) {
+                    if (err) throw err;
+                    console.log(showArtistData);
+                });
+            })
+
+    }
+    this.findSong = function (secondTerm) {
+        spotify
+            .search({
+                type: 'track',
+                query: secondTerm
+            }, function (err, data) {
+                if (err) {
+                    return console.log('Error occurred: ' + err);
+                } else {
+                    // console.log(data);
+                    var dataArray = data.tracks.items[0]
+                    // console.log(dataArray)
+                    var showSongData = [
+                        "Artist: " + dataArray.album.artists[0].name,
+                        "Song: " + dataArray.name,
+                        // // A preview link of the song from spotify
+                        "Preview: " + dataArray.album.artists[0].external_urls.spotify,
+                        "Album: " + dataArray.album.name
+
+                    ].join("\n\n");
+
+                    fs.appendFile("log.txt", showSongData + divider, function (err) {
+                        if (err) throw err;
+                        console.log(showSongData);
+                    })
+                }
+            });
+
+    }
+    this.findMovie = function (movie) {
+        axios
+            .get(
+                'http://www.omdbapi.com/?t=' + movie + "&y=&plot=short&apikey=trilogy"
+            )
+            .then(function (response) {
+                var jsonData = response.data;
+
+                var showMovieData = [
+                    "Title of Movie: " + jsonData.Title,
+                    "Year: " + jsonData.Year,
+                    "IMBD rating: " + jsonData.imdbRating,
+                    "Rotten Tomatoes Rating of the movie: " + response.ratings,
+                    "Language: " + jsonData.Language,
+                    "Plot: " + jsonData.Plot,
+                    "Actors: " + jsonData.Actors
+
+
+                ].join("\n\n");
+
+                fs.appendFile("log.txt", showMovieData + divider, function (err) {
+                    if (err) throw err;
+                    console.log(showMovieData);
+                });
+            })
+
+    }
+    this.fsPackage = function (track) {
+        fs.readFile("./random.txt", "utf8", function (err, data) {
+            if (err) throw err;
+            // console.log(data);
+            var dataArr = data.split(",");
+            // console.log(dataArr)
+             if (firstTerm === "concert-this") {
+                // console.log("concert-this");
+                this.findConcert(secondTerm);
+            } else if (firstTerm === "movie-this") {
+                // console.log("movie-this");
+                this.findMovie(secondTerm);
+            } else if (firstTerm === "do-what-it-says") {
+                // console.log("do-what-it-says");
+                this.fsPackage(secondTerm)
+               
+            } else if (firstTerm === "spotify-this-song") {
+                // console.log("spotify-this-song");
+                this.findSong(dataArr)
             }
 
 
+
+            app.findSong(dataArr)
+        });
+    }
+
 }
-concertFinder.findConcert()
+if (firstTerm === "movie-this" && !secondTerm) {
+    app.findMovie("Mr.Nobody");
+}
+
+// If no song is provided then your program will default to "The Sign" by Ace of Base.
+// if (firstTerm === "spotify-this-song" && !secondTerm) {
+//     app.findSong("The Sign");
+// }
+
+const app = new liri();
+
+var firstTerm = process.argv[2];
+
+var secondTerm = process.argv.slice(3).join(" ");
+
+
+if (firstTerm === "concert-this") {
+    // console.log("concert-this");
+    app.findConcert(secondTerm);
+} else if (firstTerm === "movie-this") {
+    // console.log("movie-this");
+    app.findMovie(secondTerm);
+} else if (firstTerm === "do-what-it-says") {
+    // console.log("do-what-it-says");
+    app.fsPackage(secondTerm)
+   
+} else if (firstTerm === "spotify-this-song") {
+    // console.log("spotify-this-song");
+    app.findSong(secondTerm)
+}
