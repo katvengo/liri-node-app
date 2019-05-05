@@ -1,5 +1,5 @@
 # liri-node-app
-##About 
+About 
 
 The Liri-Node-App utilizes several different npms: axios, spotify and moment. 
 Axios takes in information from both OMBD and Bands in Town to look for movies and concerts. Spotify takes in a query for a song and spits it out in the console. 
