@@ -97,60 +97,106 @@ var liri = function () {
 
     }
     this.fsPackage = function (track) {
+        var app = this;
+
         fs.readFile("./random.txt", "utf8", function (err, data) {
             if (err) throw err;
             // console.log(data);
             var dataArr = data.split(",");
+            var firstTerm = dataArr[0]
+            var secondTerm = dataArr[1]
             // console.log(dataArr)
-             if (firstTerm === "concert-this") {
+            if (firstTerm === "concert-this") {
                 // console.log("concert-this");
-                this.findConcert(secondTerm);
-            } else if (firstTerm === "movie-this") {
-                // console.log("movie-this");
-                this.findMovie(secondTerm);
+                app.findConcert(secondTerm);
+                // } else if (firstTerm === "movie-this") {
+                //     // console.log("movie-this");
+                //     appendFile.findMovie(secondTerm);
             } else if (firstTerm === "do-what-it-says") {
                 // console.log("do-what-it-says");
-                this.fsPackage(secondTerm)
-               
+                // app.fsPackage(secondTerm)
+
             } else if (firstTerm === "spotify-this-song") {
                 // console.log("spotify-this-song");
-                this.findSong(dataArr)
+                app.findSong(secondTerm)
             }
-
-
-
-            app.findSong(dataArr)
+            // app.findSong(dataArr)
         });
     }
 
 }
-if (firstTerm === "movie-this" && !secondTerm) {
-    app.findMovie("Mr.Nobody");
-}
 
-// If no song is provided then your program will default to "The Sign" by Ace of Base.
-// if (firstTerm === "spotify-this-song" && !secondTerm) {
-//     app.findSong("The Sign");
-// }
 
 const app = new liri();
 
-var firstTerm = process.argv[2];
+// var firstTerm = process.argv[2];
 
-var secondTerm = process.argv.slice(3).join(" ");
+// var secondTerm = process.argv.slice(3).join(" ");
 
 
-if (firstTerm === "concert-this") {
-    // console.log("concert-this");
-    app.findConcert(secondTerm);
-} else if (firstTerm === "movie-this") {
-    // console.log("movie-this");
-    app.findMovie(secondTerm);
-} else if (firstTerm === "do-what-it-says") {
-    // console.log("do-what-it-says");
-    app.fsPackage(secondTerm)
-   
-} else if (firstTerm === "spotify-this-song") {
-    // console.log("spotify-this-song");
-    app.findSong(secondTerm)
+// if (firstTerm === "concert-this") {
+//     // console.log("concert-this");
+//     app.findConcert(secondTerm);
+// } 
+
+// if (firstTerm === "movie-this") {
+//     // console.log("movie-this");
+//     app.findMovie(secondTerm);
+// } else if (!secondTerm){
+//     app.findMovie("Mr.Nobody");
+
+// if (firstTerm === "do-what-it-says") {
+//     // console.log("do-what-it-says");
+//     app.fsPackage(secondTerm)
+
+// } 
+
+// if (firstTerm === "spotify-this-song") {
+//     // console.log("spotify-this-song");
+//     app.findSong(secondTerm)
+// } else {
+//     app.findSong("The Sign");
+// }
+
+
+// if(firstTerm === "movie-this" && !secondTerm){
+//     app.findMovie("Mr.Nobody");
+// } else if(firstTerm === "spotify-this-song" && !secondTerm){
+//     app.findSong("The Sign");
+// }
+
+function acceptUserInput() {
+
+    var firstTerm = process.argv[2];
+
+    var secondTerm = process.argv.slice(3).join(" ");
+    if (firstTerm === "spotify-this-song" && !secondTerm) {
+        secondTerm = "The Sign";
+    }
+    if (firstTerm === "movie-this" && !secondTerm) {
+        secondTerm = "Mr.Nobody";
+    }
+
+    // By default, if no search term is provided, search for "Andy Griffith"
+
+    if (firstTerm === "spotify-this-song") {
+        // console.log("spotify-this-song");
+        app.findSong(secondTerm)
+    }
+    if (firstTerm === "concert-this") {
+        // console.log("concert-this");
+        app.findConcert(secondTerm);
+    }
+    if (firstTerm === "movie-this") {
+        // console.log("movie-this");
+        app.findMovie(secondTerm);
+    }
+    if (firstTerm === "do-what-it-says") {
+        // console.log("do-what-it-says");
+        app.fsPackage(secondTerm)
+
+    }
+
 }
+
+acceptUserInput()
